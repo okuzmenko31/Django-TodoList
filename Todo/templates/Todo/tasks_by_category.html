@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    My tasks
+{% endblock %}
+
+{% block sidebar %}
+    {% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block content %}
+
+    {% if 'tasks' in category.name %}
+        <h1>{{ category.name }}</h1>
+    {% else %}
+    <h1>{{ category.name }}</h1>
+    {% endif %}
+
+    {% if tasks|length > 0 %}
+        <a href="{% url 'task_creation' %}"><h5>Create new task</h5></a>
+    {% endif %}
+
+
+    {% if tasks|length > 0 %}
+
+        {% for task in tasks %}
+            <div class="card text-center">
+                <div class="card-header">
+                    Category: {{ task.category.name }}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ task.title }}</h5>
+                    <p class="card-text">{{ task.description|truncatewords:7 }}</p>
+                    <a href="{% url 'detail' task.category.slug task.id %}" class="btn btn-primary">Check details</a>
+                </div>
+            </div>
+        {% endfor %}
+
+    {% else %}
+        <h3>Now u don't have tasks in this category, click the button to create it</h3>
+        <a href="{% url 'task_creation' %}" class="button btn btn-success">Create my first task</a>
+    {% endif %}
+
+
+
+
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Task update
+{% endblock %}
+
+{% block sidebar %}
+    {% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block content %}
+
+
+
+    <h1>Update task</h1>
+    <h3>Change only the fields you want to update</h3>
+    <a href="{% url 'detail' task.category.slug task.id %}"><h5>Go to detail page of this task</h5></a>
+    <br>
+    <br>
+
+
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit" class="btn btn-success btn-block">Update</button>
+
+    </form>
+
+{% endblock %}

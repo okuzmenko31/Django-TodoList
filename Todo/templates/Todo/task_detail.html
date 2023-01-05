@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ task.title }}
+{% endblock %}
+
+{% block sidebar %}
+    {% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+
+{% block content %}
+
+
+
+    <h1>Task: {{ task.title }}</h1>
+    <a href="{% url 'user_tasks' %}"><h5>Go to all tasks</h5></a>
+    <br>
+    <br>
+
+    <div class="card text-center">
+        <div class="card-body">
+            <h2 class="card-title">{{ task.title }}</h2>
+            <p class="card-text"><h5>{{ task.description }}</h5></p>
+            {% if task.complete %}
+                <p class="card-text">Task status: completed</p>
+            {% else %}
+                <p class="card-text">Task status: not completed</p>
+            {% endif %}
+
+            {% if task.complete %}
+                <a href="{% url 'delete' task.id %}" class="btn btn-danger">Delete</a>
+            {% else %}
+                <a href="{% url 'update' task.category.slug task.id %}" class="btn btn-primary">Update</a>
+                <a href="{% url 'delete' task.id %}" class="btn btn-danger">Delete</a>
+            {% endif %}
+
+        </div>
+    </div>
+
+{% endblock %}

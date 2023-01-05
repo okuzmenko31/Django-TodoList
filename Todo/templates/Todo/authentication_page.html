@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Authentication
+{% endblock %}
+
+{% block sidebar %}
+    {% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block content %}
+    <h1>Authentication</h1>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit" class="btn btn-success btn-block">Authenticate</button>
+
+    </form>
+
+{% endblock %}

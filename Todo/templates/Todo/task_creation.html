@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Tasks creation
+{% endblock %}
+
+{% block sidebar %}
+    {% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block content %}
+    <h1>Create task</h1>
+    <a href="{% url 'user_tasks' %}"><h5>Go to all tasks page</h5></a>
+    <br>
+    <br>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit" class="btn btn-success btn-block">Create</button>
+
+    </form>
+
+{% endblock %}
