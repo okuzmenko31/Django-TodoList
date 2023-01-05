@@ -13,7 +13,7 @@
     {% if 'tasks' in category.name %}
         <h1>{{ category.name }}</h1>
     {% else %}
-    <h1>{{ category.name }}</h1>
+        <h1>{{ category.name }}</h1>
     {% endif %}
 
     {% if tasks|length > 0 %}
@@ -24,14 +24,22 @@
     {% if tasks|length > 0 %}
 
         {% for task in tasks %}
-            <div class="card text-center">
-                <div class="card-header">
-                    Category: {{ task.category.name }}
-                </div>
+            <div class="card" style="border-width: 1px; border-color: black !important; margin-top: 40px">
                 <div class="card-body">
-                    <h5 class="card-title">{{ task.title }}</h5>
-                    <p class="card-text">{{ task.description|truncatewords:7 }}</p>
+                    <h2 class="card-title">{{ task.title }}</h2>
+                    <p class="card-text"><h5>{{ task.description|truncatewords:7 }}</h5></p>
+                    {% if task.complete %}
+                        <p class="card-text">Task status: completed</p>
+                    {% else %}
+                        <p class="card-text">Task status: not completed</p>
+                    {% endif %}
                     <a href="{% url 'detail' task.category.slug task.id %}" class="btn btn-primary">Check details</a>
+                    {% if task.complete %}
+                        <a href="{% url 'delete' task.id %}" class="btn btn-danger">Delete</a>
+                    {% else %}
+                        <a href="{% url 'update' task.category.slug task.id %}" class="btn btn-success">Update</a>
+                        <a href="{% url 'delete' task.id %}" class="btn btn-danger">Delete</a>
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}

@@ -18,7 +18,7 @@
     <br>
     <br>
 
-    <div class="card text-center">
+    <div class="card" style="margin-top: 40px">
         <div class="card-body">
             <h2 class="card-title">{{ task.title }}</h2>
             <p class="card-text"><h5>{{ task.description }}</h5></p>
@@ -31,7 +31,7 @@
             {% if task.complete %}
                 <a href="{% url 'delete' task.id %}" class="btn btn-danger">Delete</a>
             {% else %}
-                <a href="{% url 'update' task.category.slug task.id %}" class="btn btn-primary">Update</a>
+                <a href="{% url 'update' task.category.slug task.id %}" class="btn btn-success">Update</a>
                 <a href="{% url 'delete' task.id %}" class="btn btn-danger">Delete</a>
             {% endif %}
 

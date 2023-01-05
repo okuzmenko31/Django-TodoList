@@ -37,6 +37,7 @@ class TaskCreation(forms.ModelForm):
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
             'category': forms.Select(attrs={'class': 'form-control'}),
+            # 'date': forms.DateInput(attrs={'class': 'form-control'})
         }
 
 
@@ -46,6 +47,7 @@ class TaskUpdate(forms.ModelForm):
     description = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5}))
     category = forms.ModelChoiceField(queryset=Category.objects.all(), required=False,
                                       widget=forms.Select(attrs={'class': 'form-control'}))
+    # date = forms.DateField(required=False, widget=forms.DateInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = Todo

@@ -56,9 +56,9 @@ def user_task_creation(request):
             task.save()
 
             subject = f'TODO LIST - {request.user.username} You successfully created new task!'
-            message = f'Your task\n\n' \
-                      f'{task.title}\n\n\n' \
-                      f'{task.description}\n\n\n' \
+            message = f'Your task:\n\n' \
+                      f'Task title: {task.title}\n' \
+                      f'Task description: {task.description}\n' \
                       f'{task.category}\n\n\n'
             send_mail(subject, message, 'kuzmenkowebdev@gmail.com', [request.user.email])
 
@@ -98,6 +98,7 @@ def task_update(request, task_id, cat_slug):
     task_title = task.title
     task_desc = task.description
     task_cat = task.category
+    # task_date = task.date
 
     cat_slug = Category.objects.get(slug=cat_slug)
 
@@ -108,6 +109,7 @@ def task_update(request, task_id, cat_slug):
             complete = form.cleaned_data['complete']
             description = form.cleaned_data['description'] or task_desc
             category = form.cleaned_data['category'] or task_cat
+            # date = form.cleaned_data['date'] or task_date
 
             Todo.objects.update(id=task_id, user=request.user, title=title, complete=complete, description=description,
                                 category=category)
