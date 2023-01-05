@@ -3,3 +3,4 @@ venv
 *.pyc
 *migrations
 static
+email_password_config.ini
