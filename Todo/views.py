@@ -98,23 +98,22 @@ def task_update(request, task_id, cat_slug):
     task_title = task.title
     task_desc = task.description
     task_cat = task.category
-    # task_date = task.date
+    task_date = task.date
 
     cat_slug = Category.objects.get(slug=cat_slug)
 
     if request.method == 'POST':
         form = TaskUpdate(request.POST)
         if form.is_valid():
-            title = form.cleaned_data['title'] or task_title
-            complete = form.cleaned_data['complete']
-            description = form.cleaned_data['description'] or task_desc
-            category = form.cleaned_data['category'] or task_cat
-            # date = form.cleaned_data['date'] or task_date
+            task.title = form.cleaned_data['title'] or task_title
+            task.complete = form.cleaned_data['complete']
+            task.description = form.cleaned_data['description'] or task_desc
+            task.category = form.cleaned_data['category'] or task_cat
+            task.date = form.cleaned_data['date'] or task_date
+            task.save()
 
-            Todo.objects.update(id=task_id, user=request.user, title=title, complete=complete, description=description,
-                                category=category)
             send_mail(f'{request.user.username} - Your task was updated successfully!',
-                      f'Your task {title} was updated!',
+                      f'Your task {task.title} was updated!',
                       'kuzmenkowebdev@gmail.com', [request.user.email])
             messages.success(request, 'Task was updated successfully')
             return redirect('user_tasks')
