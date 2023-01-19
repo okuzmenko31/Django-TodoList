@@ -63,3 +63,11 @@ class UserPasswordChange(PasswordChangeForm):
 
 class UserResetPassword(PasswordResetForm):
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
+
+
+class UserChangeEmail(forms.Form):
+    code = forms.CharField(label='Code',
+                           help_text='Write here four-digit code which was sent to your email',
+                           widget=forms.TextInput({'class': 'form-control'}))
+    new_email = forms.EmailField(label='Your new email',
+                                 widget=forms.EmailInput(attrs={'class': 'form-control'}))

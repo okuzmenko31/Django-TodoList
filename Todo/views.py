@@ -1,3 +1,4 @@
+import random
 from django.contrib.auth import login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -7,7 +8,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from .forms import Registration, Authentication, TaskCreation, TaskUpdate, UserPasswordChange, UserResetPassword
+from .forms import Registration, Authentication, TaskCreation, TaskUpdate, UserPasswordChange, UserResetPassword, \
+    UserChangeEmail
 from .tasks import *
 from .models import Todo, Category
 
@@ -150,8 +152,17 @@ def tasks_by_category(request, cat_id, cat_slug):
 @login_required(login_url='/my_todolist/authentication')
 def user_profile(request):
     form = UserPasswordChange(user=request.user)
+<<<<<<< HEAD
     context = {
         'form': form,
+=======
+    reset_form = UserResetPassword()
+    change_email_form = UserChangeEmail()
+    context = {
+        'form': form,
+        'reset_form': reset_form,
+        'change_email_form': change_email_form
+>>>>>>> change_mail
     }
 
     return render(request, template_name='Todo/user_page.html', context=context)
@@ -197,3 +208,30 @@ def user_reset_password(request):
                           html_message=msg_html)
                 messages.success(request, 'Mail was sent successfully!')
     return redirect('authentication')
+
+
+def user_change_email(request):
+    code = random.randint(1000, 9999)
+    request.session['change_code'] = str(code)
+
+    subject = 'You send request for changing your email address at the TodoList site'
+    message = f'Your code: {code}'
+    send_mail(subject, message, 'kuzmenkowebdev@gmail.com', [request.user.email], fail_silently=False)
+    messages.success(request, 'Mail with the code was sent successfully!')
+
+    return redirect('account')
+
+
+def change_email_process(request):
+    if request.method == 'POST':
+        change_email_form = UserChangeEmail(request.POST)
+        if change_email_form.is_valid():
+            code = change_email_form.cleaned_data['code']
+            if code == request.session['change_code']:
+                del request.session['change_code']
+                request.user.email = change_email_form.cleaned_data['new_email']
+                request.user.save()
+                messages.success(request, 'You successfully changed your email!')
+            else:
+                messages.error(request, 'The code is wrong, write it again')
+    return redirect('account')
