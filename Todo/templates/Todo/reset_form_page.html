@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Reset password
+{% endblock %}
+
+{% block sidebar %}
+    {% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block content %}
+    <h4 class="reset_password" style="margin-top: 50px">Reset password:</h4>
+    <form action="{% url 'reset_password' %}" method="post">
+
+        {% csrf_token %}
+        {{ reset_form.as_p }}
+        <button type="submit" class="btn btn-success">Send mail</button>
+
+    </form>
+{% endblock %}

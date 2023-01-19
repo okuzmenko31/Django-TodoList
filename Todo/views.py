@@ -97,6 +97,7 @@ def task_detail(request, task_id, cat_slug):
     return render(request, 'Todo/task_detail.html', {'task': task})
 
 
+@login_required(login_url='/my_todolist/registration')
 def task_update(request, task_id, cat_slug):
     task = Todo.objects.get(id=task_id, user=request.user)
 
@@ -126,6 +127,7 @@ def task_update(request, task_id, cat_slug):
     return render(request, 'Todo/task_update.html', {'form': form, 'task': task})
 
 
+@login_required(login_url='/my_todolist/registration')
 def task_delete(request, task_id):
     task = Todo.objects.get(id=task_id, user=request.user)
     task.delete()
@@ -133,6 +135,7 @@ def task_delete(request, task_id):
     return redirect('user_tasks')
 
 
+@login_required(login_url='/my_todolist/registration')
 def tasks_by_category(request, cat_id, cat_slug):
     category = Category.objects.get(id=cat_id, slug=cat_slug)
     tasks = Todo.objects.filter(user=request.user, category_id=cat_id).select_related('category')
@@ -147,10 +150,8 @@ def tasks_by_category(request, cat_id, cat_slug):
 @login_required(login_url='/my_todolist/authentication')
 def user_profile(request):
     form = UserPasswordChange(user=request.user)
-    reset_form = UserResetPassword()
     context = {
         'form': form,
-        'reset_form': reset_form
     }
 
     return render(request, template_name='Todo/user_page.html', context=context)
@@ -164,6 +165,11 @@ def user_change_password(request):
             form.save()
             messages.success(request, 'You successfully changed your password!')
     return redirect('authentication')
+
+
+def reset_password_page(request):
+    reset_form = UserResetPassword()
+    return render(request, 'Todo/reset_form_page.html', {'reset_form': reset_form})
 
 
 def user_reset_password(request):

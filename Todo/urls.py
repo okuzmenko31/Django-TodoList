@@ -14,6 +14,7 @@ urlpatterns = [
     path('tasks/<slug:cat_slug>/<int:cat_id>/', tasks_by_category, name='by_category'),
     path('account_settings/', user_profile, name='account'),
     path('user_change_password/', user_change_password, name='change_password'),
+    path('reset_password/', reset_password_page, name='reset_password_page'),
     path('user_reset_password/', user_reset_password, name='reset_password'),
     path('reset/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(template_name='Todo/confirmation.html'),
          name='confirmation'),

@@ -15,16 +15,11 @@
         {% csrf_token %}
         {{ form.as_p }}
 
-        <button type="submit" class="btn btn-success btn-block">Authenticate</button>
-
-    </form>
-
-    <h4 class="reset_password" style="margin-top: 50px">Reset password:</h4>
-    <form action="{% url 'reset_password' %}" method="post">
-
-        {% csrf_token %}
-        {{ reset_form.as_p }}
-        <button type="submit" class="btn btn-success">Send mail</button>
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-success btn-block">Authenticate</button>
+            <a href="{% url 'reset_password_page' %}" style="margin-left: 300px; margin-top: 10px"><h5>Forgot your
+                password?</h5></a>
+        </div>
 
     </form>
 
