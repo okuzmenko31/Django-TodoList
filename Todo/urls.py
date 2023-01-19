@@ -19,4 +19,6 @@ urlpatterns = [
          name='confirmation'),
     path('reset/done/', views.PasswordResetDoneView.as_view(template_name='Todo/reset_done.html'),
          name='password_reset_complete'),
+    path('mail_change/', user_change_email, name='change_email'),
+    path('mail_change_process/', change_email_process, name='change_email_process')
 ]

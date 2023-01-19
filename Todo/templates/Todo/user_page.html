@@ -17,5 +17,14 @@
 
     </form>
 
+    <h4 class="email_change" style="margin-top: 50px">Change my email</h4>
+    <a href="{% url 'change_email' %}" class="btn btn-success">Send code to the email</a>
+
+    <form action="{% url 'change_email_process' %}" method="post" style="margin-top: 20px; margin-bottom: 60px">
+        {% csrf_token %}
+        {{ change_email_form.as_p }}
+
+        <button type="submit" class="btn btn-success">Change</button>
+    </form>
 
 {% endblock %}
