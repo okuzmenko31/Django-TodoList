@@ -152,17 +152,13 @@ def tasks_by_category(request, cat_id, cat_slug):
 @login_required(login_url='/my_todolist/authentication')
 def user_profile(request):
     form = UserPasswordChange(user=request.user)
-<<<<<<< HEAD
-    context = {
-        'form': form,
-=======
+
     reset_form = UserResetPassword()
     change_email_form = UserChangeEmail()
     context = {
         'form': form,
         'reset_form': reset_form,
         'change_email_form': change_email_form
->>>>>>> change_mail
     }
 
     return render(request, template_name='Todo/user_page.html', context=context)
