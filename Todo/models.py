@@ -1,5 +1,3 @@
-import datetime
-
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -23,7 +21,8 @@ class Todo(models.Model):
     description = models.TextField(blank=True, verbose_name='Description of task')
     complete = models.BooleanField(default=False, verbose_name='The task completed or not?')
     created = models.DateTimeField(auto_now_add=True)
-    date = models.DateField(default=timezone.now().strftime('%Y-%m-%d'), verbose_name='Deadline', blank=True)
+    date = models.DateField(default=timezone.now().strftime('%Y-%m-%d'), verbose_name='Date of task creation',
+                            blank=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True, verbose_name='Category')
 
     def __str__(self):

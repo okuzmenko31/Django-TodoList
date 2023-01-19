@@ -1,3 +1,4 @@
+from django.contrib.auth import views
 from django.urls import path
 from .views import *
 
@@ -11,4 +12,11 @@ urlpatterns = [
     path('category/<slug:cat_slug>/task/<int:task_id>/update/', task_update, name='update'),
     path('task_delete/task/<int:task_id>/', task_delete, name='delete'),
     path('tasks/<slug:cat_slug>/<int:cat_id>/', tasks_by_category, name='by_category'),
+    path('account_settings/', user_profile, name='account'),
+    path('user_change_password/', user_change_password, name='change_password'),
+    path('user_reset_password/', user_reset_password, name='reset_password'),
+    path('reset/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(template_name='Todo/confirmation.html'),
+         name='confirmation'),
+    path('reset/done/', views.PasswordResetDoneView.as_view(template_name='Todo/reset_done.html'),
+         name='password_reset_complete'),
 ]

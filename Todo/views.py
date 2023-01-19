@@ -1,11 +1,15 @@
 from django.contrib.auth import login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from .models import Category, Todo
-from .forms import Registration, Authentication, TaskCreation, TaskUpdate
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from .forms import Registration, Authentication, TaskCreation, TaskUpdate, UserPasswordChange, UserResetPassword
+from .tasks import *
+from .models import Todo, Category
 
 
 def user_registration(request):
@@ -15,20 +19,25 @@ def user_registration(request):
         if request.method == 'POST':
             form = Registration(request.POST)
             if form.is_valid():
-                user = form.save()
-                login(request, user)
-                subject = f'{user.username} - You successfully created account at the Todo List Site!'
-                message = f'Now you can start creating your todo list. Dont forget to follow me on GitHub:\n' \
-                          f'https://github.com/okuzmenko31'
-                send_mail(subject, message, 'kuzmenkowebdev@gmail.com', [request.user.email])
-                messages.success(request, 'You successfully created account')
-                return redirect('user_tasks')
+                users_emails = []
+                for item in User.objects.all():
+                    users_emails.append(item.email)
+                if form.cleaned_data['email'] in users_emails:
+                    messages.error(request, 'User with this email is already exists')
+                    return redirect(request.path)
+                else:
+                    user = form.save()
+                    login(request, user)
+                    messages.success(request, 'You successfully created account')
+                    send_registration_mail.delay(user.username, user.email)
+                    return redirect('user_tasks')
         else:
             form = Registration()
         return render(request, 'Todo/registration_page.html', {'form': form})
 
 
 def user_login(request):
+    reset_form = UserResetPassword()
     if request.user.is_authenticated:
         return redirect('user_tasks')
     else:
@@ -41,7 +50,7 @@ def user_login(request):
                 return redirect('user_tasks')
         else:
             form = Authentication()
-        return render(request, 'Todo/authentication_page.html', {'form': form})
+        return render(request, 'Todo/authentication_page.html', {'form': form, 'reset_form': reset_form})
 
 
 def user_task_creation(request):
@@ -55,12 +64,8 @@ def user_task_creation(request):
             task.category = form.cleaned_data['category']
             task.save()
 
-            subject = f'TODO LIST - {request.user.username} You successfully created new task!'
-            message = f'Your task:\n\n' \
-                      f'Task title: {task.title}\n' \
-                      f'Task description: {task.description}\n' \
-                      f'{task.category}\n\n\n'
-            send_mail(subject, message, 'kuzmenkowebdev@gmail.com', [request.user.email])
+            task_creation_mail.delay(request.user.username, request.user.email, task.title, task.description,
+                                     task.category.name)
 
             messages.success(request, f'Task created successfully')
             return redirect('user_tasks')
@@ -72,7 +77,7 @@ def user_task_creation(request):
 
 @login_required(login_url='/my_todolist/registration')
 def user_tasks(request):
-    tasks = Todo.objects.filter(user=request.user)
+    tasks = Todo.objects.filter(user=request.user).select_related('category')
 
     return render(request, 'Todo/user_tasks.html', {'tasks': tasks})
 
@@ -112,9 +117,8 @@ def task_update(request, task_id, cat_slug):
             task.date = form.cleaned_data['date'] or task_date
             task.save()
 
-            send_mail(f'{request.user.username} - Your task was updated successfully!',
-                      f'Your task {task.title} was updated!',
-                      'kuzmenkowebdev@gmail.com', [request.user.email])
+            task_updating_mail.delay(request.user.username, request.user.email, task.title)
+
             messages.success(request, 'Task was updated successfully')
             return redirect('user_tasks')
     else:
@@ -131,10 +135,59 @@ def task_delete(request, task_id):
 
 def tasks_by_category(request, cat_id, cat_slug):
     category = Category.objects.get(id=cat_id, slug=cat_slug)
-    tasks = Todo.objects.filter(user=request.user, category_id=cat_id)
+    tasks = Todo.objects.filter(user=request.user, category_id=cat_id).select_related('category')
 
     context = {
         'category': category,
         'tasks': tasks
     }
     return render(request, template_name='Todo/tasks_by_category.html', context=context)
+
+
+@login_required(login_url='/my_todolist/authentication')
+def user_profile(request):
+    form = UserPasswordChange(user=request.user)
+    reset_form = UserResetPassword()
+    context = {
+        'form': form,
+        'reset_form': reset_form
+    }
+
+    return render(request, template_name='Todo/user_page.html', context=context)
+
+
+@login_required(login_url='/my_todolist/authentication')
+def user_change_password(request):
+    if request.method == 'POST':
+        form = UserPasswordChange(data=request.POST, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'You successfully changed your password!')
+    return redirect('authentication')
+
+
+def user_reset_password(request):
+    if request.method == 'POST':
+        reset_form = UserResetPassword(request.POST)
+        if reset_form.is_valid():
+            mail = reset_form.cleaned_data['email']
+
+            user = User.objects.get(email=mail)
+
+            if user:
+                subject = 'Requested password reset'
+                email_template_name = 'Todo/reset_password_mail.html'
+                cont = {
+                    'email': mail,
+                    'domain': '127.0.0.1:8000',
+                    'site_name': 'TodoList',
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'user': user,
+                    'token': default_token_generator.make_token(user),
+                    'protocol': 'http',
+                }
+                msg_html = render_to_string(email_template_name, cont)
+                send_mail(subject, 'ссылка', 'kuzmenkowebdev@gmail.com', [mail], fail_silently=False,
+                          html_message=msg_html)
+                messages.success(request, 'Mail was sent successfully!')
+    return redirect('authentication')

@@ -1,6 +1,9 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, PasswordResetForm, \
+    SetPasswordForm
 from django.contrib.auth.models import User
+from django.contrib import messages
+
 from .models import Todo, Category
 
 
@@ -37,7 +40,6 @@ class TaskCreation(forms.ModelForm):
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
             'category': forms.Select(attrs={'class': 'form-control'}),
-            'date': forms.DateInput(attrs={'class': 'form-control'})
         }
 
 
@@ -47,13 +49,17 @@ class TaskUpdate(forms.ModelForm):
     description = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5}))
     category = forms.ModelChoiceField(queryset=Category.objects.all(), required=False,
                                       widget=forms.Select(attrs={'class': 'form-control'}))
-    date = forms.DateField(required=False, widget=forms.DateInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = Todo
-        fields = ['title', 'complete', 'description', 'date', 'category']
-        # widgets = {
-        #     'title': forms.TextInput(attrs={'class': 'form-control'}),
-        #     'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
-        #     'category': forms.Select(attrs={'class': 'form-control'}),
-        # }
+        fields = ['title', 'complete', 'description', 'category']
+
+
+class UserPasswordChange(PasswordChangeForm):
+    old_password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+
+
+class UserResetPassword(PasswordResetForm):
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))

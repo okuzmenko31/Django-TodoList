@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ request.user.username }} - personal area
+{% endblock %}
+
+{% block content %}
+
+    <h1>Account settings</h1>
+
+    <h4 class="password_change" style="margin-top: 50px">Change my password:</h4>
+    <form action="{% url 'change_password' %}" method="post">
+
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Change</button>
+
+    </form>
+
+
+{% endblock %}

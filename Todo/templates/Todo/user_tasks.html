@@ -19,7 +19,8 @@
     {% if tasks|length > 0 %}
 
         {% for task in tasks %}
-            <div class="card" style="border-width: 1px; border-color: black !important; margin-top: 40px">
+            <div class="card"
+                 style="border-width: 1px; border-color: black !important; margin-top: 40px; margin-bottom: 50px">
                 <div class="card-header">
                     Category: {{ task.category.name }}
                 </div>
@@ -31,6 +32,7 @@
                     {% else %}
                         <p class="card-text">Task status: not completed</p>
                     {% endif %}
+                    <p class="card-text">Deadline: {{ task.date }}</p>
                     <a href="{% url 'detail' task.category.slug task.id %}" class="btn btn-primary">Check details</a>
                     {% if task.complete %}
                         <a href="{% url 'delete' task.id %}" class="btn btn-danger">Delete</a>
